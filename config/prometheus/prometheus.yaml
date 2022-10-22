@@ -1,8 +1,9 @@
 global:
-  scrape_interval: 5s
+  scrape_interval: 15s
   external_labels:
     cluster: demo
     namespace: demo
+    __replica__: ${PODNAME} 
 
 rule_files:
   - /etc/prometheus/rules.yaml

@@ -1,5 +1,11 @@
 version: '3.4'
 services:
+  consul:
+    image: consul
+    command: [ "agent", "-dev" ,"-client=0.0.0.0", "-log-level=info" ]
+    ports:
+      - 8500:8500
+
   minio:
     image: minio/minio
     entrypoint: [""]
@@ -13,15 +19,28 @@ services:
     volumes:
       - data-minio:/data
 
-  prometheus:
+  prometheus-1:
     image: prom/prometheus:v2.39.1
     command: ["--config.file=/etc/prometheus/prometheus.yaml", "--enable-feature=expand-external-labels", "--log.level=debug"]
+    environment:
+      PODNAME: prometheus-1
     volumes:
       - ./config/prometheus:/etc/prometheus
-      - data-prometheus:/prometheus
+      - data-prometheus-1:/prometheus
     ports:
       - 9090:9090
-      
+  
+  prometheus-2:
+    image: prom/prometheus:v2.39.1
+    command: ["--config.file=/etc/prometheus/prometheus.yaml", "--enable-feature=expand-external-labels", "--log.level=debug"]
+    environment:
+      PODNAME: prometheus-2
+    volumes:
+      - ./config/prometheus:/etc/prometheus
+      - data-prometheus-2:/prometheus
+    ports:
+      - 9091:9090
+
   grafana:
     image: grafana/grafana:9.1.2
     pull_policy: always
@@ -56,6 +75,7 @@ services:
     hostname: cortex-1
     depends_on:
       - minio
+      - consul
     command: ["-config.file=/cortex/config/cortex.yaml", "-log.level=debug"]
     ports:
       - 8001:80
@@ -69,6 +89,7 @@ services:
     command: ["-config.file=/cortex/config/cortex.yaml", "-log.level=debug"]
     depends_on:
       - minio
+      - consul
     ports:
       - 8002:80
     volumes:
@@ -81,6 +102,7 @@ services:
     command: ["-config.file=/cortex/config/cortex.yaml", "-log.level=debug"]
     depends_on:
       - minio
+      - consul
     ports:
       - 8003:80
     volumes:
@@ -89,7 +111,8 @@ services:
 
 volumes:
   data-minio:
-  data-prometheus:
+  data-prometheus-1:
+  data-prometheus-2:
   data-cortex-1:
   data-cortex-2:
   data-cortex-3:
