@@ -69,3 +69,76 @@ The following ports will be exposed on the host:
 - Cortex on [http://localhost:8001~8003](http://localhost:8001)
 - Minio on [http://localhost:9002](http://localhost:9002), super account is `cortex/supersecret`
 - Prometheus on [http://localhost:9090](http://localhost:9090)
+
+### Lesson 2
+
+In this Lesson, you'll learn how to use Cortex distributor's HATracker.
+
+You can run test with command:
+
+```
+git checkout lesson2
+docker-compose up -d
+```
+
+When you visit `http://localhost:8001/distributor/ha_tracker`, you will see HATracker worked:
+
+![ha_tracker.png](./image/ha_tracker.png)
+
+If you stop the master(`prometheus-2` here), about 30s later it will auto change to `prometheus-1`.
+
+#### Details about the changes
+
+Change `cortex.yaml` to enable HATracker
+
+```
+limits:
+  accept_ha_samples: true
+
+distributor:
+    ha_tracker:
+    enable_ha_tracker: true
+    kvstore:
+        store: consul
+        consul:
+        host: consul:8500
+```
+
+Note: HATracker's KV store only support consul and etcd, so we use consul here.
+
+Update `docker-compose.yaml` to add consul dependence.
+
+```
+services:
+  consul:
+    image: consul
+    command: [ "agent", "-dev" ,"-client=0.0.0.0", "-log-level=info" ]
+    ports:
+      - 8500:8500
+```
+
+We need another Prometheus like existed one
+
+```
+ prometheus-2:
+    image: prom/prometheus:v2.39.1
+    command: ["--config.file=/etc/prometheus/prometheus.yaml", "--enable-feature=expand-external-labels", "--log.level=debug"]
+    environment:
+      PODNAME: prometheus-2
+    volumes:
+      - ./config/prometheus:/etc/prometheus
+      - data-prometheus-2:/prometheus
+    ports:
+      - 9091:9090
+```
+
+And add `ha_cluster_label` and `ha_replica_label` labels to `prometheus.yaml`
+
+```
+global:
+  external_labels:
+    cluster: demo
+    __replica__: ${PODNAME} 
+```
+
+Note: `ha_cluster_label` default value is `cluster`, `ha_replica_label` is `__replica__`. you can configurate to another with `limits_config`.
