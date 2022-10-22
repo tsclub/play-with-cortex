@@ -81,13 +81,13 @@ git checkout lesson2
 docker-compose up -d
 ```
 
-When you visit `http://localhost:8001/distributor/ha_tracker`, you will see HATracker worked:
+When you visit [http://localhost:8001/distributor/ha_tracker](http://localhost:8001/distributor/ha_tracker), you will see HATracker workes.
 
-![ha_tracker.png](./image/ha_tracker.png)
+![ha_tracker.png](./images/ha_tracker.png)
 
-If you stop the master(`prometheus-2` here), about 30s later it will auto change to `prometheus-1`.
+If you stop `prometheus-2`, about 30s later it will auto change master to `prometheus-1`.
 
-#### Details about the changes
+#### Details about the change
 
 Change `cortex.yaml` to enable HATracker
 
