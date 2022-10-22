@@ -1,0 +1,19 @@
+global:
+  scrape_interval: 5s
+  external_labels:
+    cluster: demo
+    namespace: demo
+
+rule_files:
+  - /etc/prometheus/rules.yaml
+
+scrape_configs:
+  - job_name: demo/cortex
+    static_configs:
+      - targets: ['cortex-1','cortex-2','cortex-3']
+
+remote_write:
+  - url: http://load-balancer/api/v1/push
+    headers:
+      X-Scope-OrgID: demo
+    send_exemplars: true
