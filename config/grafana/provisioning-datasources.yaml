@@ -1,0 +1,18 @@
+apiVersion: 1
+
+datasources:
+  - name: Cortex
+    type: prometheus
+    access: proxy
+    orgId: 1
+    url: http://load-balancer/prometheus
+    version: 1
+    # add basic auth
+    basicAuth: true
+    basicAuthUser: user
+    editable: true
+    jsonData:
+      httpHeaderName1: 'X-Scope-OrgID'
+    secureJsonData:
+      httpHeaderValue1: 'demo'
+    isDefault: true
