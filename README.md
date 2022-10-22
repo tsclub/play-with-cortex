@@ -37,13 +37,6 @@ docker-compose down
 
 ### Lesson 1
 
-In this Lesson, you'll:
-
-- Run three Cortex instances locally with Docker Compose
-- Run one Prometheus to scrape all Cortex metrics and remote write to Cortex cluster
-- Run Grafana to explore Cortex dashboards
-- Configure a testing recording rule and alert to Cortex with Promethues side evaluate
-
 Start running your local setup with the following Docker command:
 
 ```
