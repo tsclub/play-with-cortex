@@ -21,7 +21,7 @@ services:
 
   prometheus-1:
     image: prom/prometheus:v2.39.1
-    command: ["--config.file=/etc/prometheus/prometheus.yaml", "--enable-feature=expand-external-labels", "--log.level=debug"]
+    command: ["--config.file=/etc/prometheus/prometheus.yaml", "--enable-feature=expand-external-labels", "--enable-feature=agent", "--log.level=debug"]
     environment:
       PODNAME: prometheus-1
     volumes:
@@ -32,7 +32,7 @@ services:
   
   prometheus-2:
     image: prom/prometheus:v2.39.1
-    command: ["--config.file=/etc/prometheus/prometheus.yaml", "--enable-feature=expand-external-labels", "--log.level=debug"]
+    command: ["--config.file=/etc/prometheus/prometheus.yaml", "--enable-feature=expand-external-labels", "--enable-feature=agent", "--log.level=debug"]
     environment:
       PODNAME: prometheus-2
     volumes:

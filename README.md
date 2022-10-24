@@ -142,3 +142,49 @@ global:
 ```
 
 Note: `ha_cluster_label` default value is `cluster`, `ha_replica_label` is `__replica__`. you can configurate to another with `limits_config`.
+
+### Lesson 3
+
+In this Lesson, you'll learn how to enable record rules with cortex's ruler.
+
+You can run test with command:
+
+```
+git checkout lesson3
+docker-compose up -d
+```
+
+After started, we use `curl` command to create some record rules
+
+```
+$ curl -X POST -H 'X-Scope-OrgID: demo' -H 'content-type:application/yaml' --data-binary "@./config/cortex/rules/cortex_api_1.yaml"  http://localhost:8001/api/v1/rules/cortex
+
+
+{"status":"success","data":null,"errorType":"","error":""}
+```
+
+If you want to create all cortex related record rules, run `sh bin/rules.sh` please, after added you can check all of them with Cortex API
+
+```
+$ curl -H 'X-Scope-OrgID: demo' http://localhost:8001/api/v1/rules
+```
+
+At last we can go to `Cortex/Ruler` Grafana dashboard to check ruler running status.
+
+![ruler.png](./images/ruler.png)
+
+#### Details about the change
+
+We change Prometheus to Agent mode with `--enable-feature=agent` flag and remove the `rule_files` configuration from `prometheus.yaml` 
+
+Update `cortex.yaml` to enable ruler and enable sharding
+
+```
+ruler:
+  enable_api: true
+  enable_sharding: true
+  poll_interval: 2s
+  ring:
+    kvstore:
+      store: memberlist
+```

@@ -1,0 +1,5 @@
+name: cortex_received_exemplars
+rules:
+- expr: |
+    sum by (cluster, namespace, job) (rate(cortex_distributor_received_exemplars_total[5m]))
+  record: cluster_namespace_job:cortex_distributor_received_exemplars:rate5m
