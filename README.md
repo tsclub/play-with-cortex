@@ -37,6 +37,11 @@ docker-compose down
 
 ### Lesson 1
 
+In this Lesson, you'll learn how to run Cortex cluster local with Docker Compose.
+
+<details>
+  <summary>Click me</summary>
+
 Start running your local setup with the following Docker command:
 
 ```
@@ -69,11 +74,15 @@ The following ports will be exposed on the host:
 - Cortex on [http://localhost:8001~8003](http://localhost:8001)
 - Minio on [http://localhost:9002](http://localhost:9002), super account is `cortex/supersecret`
 - Prometheus on [http://localhost:9090](http://localhost:9090)
+</details>
 
 ### Lesson 2
 
 In this Lesson, you'll learn how to use Cortex distributor's HATracker.
 
+<details>
+  <summary>Click me</summary>
+  
 You can run test with command:
 
 ```
@@ -87,7 +96,7 @@ When you visit [http://localhost:8001/distributor/ha_tracker](http://localhost:8
 
 If you stop `prometheus-2`, about 30s later it will auto change master to `prometheus-1`.
 
-#### Details about the change
+#### The changes
 
 Change `cortex.yaml` to enable HATracker
 
@@ -143,10 +152,15 @@ global:
 
 Note: `ha_cluster_label` default value is `cluster`, `ha_replica_label` is `__replica__`. you can configurate to another with `limits_config`.
 
+</details>
+
 ### Lesson 3
 
 In this Lesson, you'll learn how to enable record rules with cortex's ruler.
 
+<details>
+  <summary>Click me</summary>
+  
 You can run test with command:
 
 ```
@@ -163,7 +177,7 @@ $ curl -X POST -H 'X-Scope-OrgID: demo' -H 'content-type:application/yaml' --dat
 {"status":"success","data":null,"errorType":"","error":""}
 ```
 
-If you want to create all cortex related record rules, run `sh bin/rules.sh` please, after added you can check all of them with Cortex API
+If you want to create all cortex related record rules, run `sh bin/rules.sh` please, after that we can check them with Cortex API
 
 ```
 $ curl -H 'X-Scope-OrgID: demo' http://localhost:8001/api/v1/rules
@@ -173,11 +187,11 @@ At last we can go to `Cortex/Ruler` Grafana dashboard to check ruler running sta
 
 ![ruler.png](./images/ruler.png)
 
-#### Details about the change
+#### The changes
 
 We change Prometheus to Agent mode with `--enable-feature=agent` flag and remove the `rule_files` configuration from `prometheus.yaml` 
 
-Update `cortex.yaml` to enable ruler and enable sharding
+Update `cortex.yaml` to enable ruler with default sharding
 
 ```
 ruler:
@@ -188,3 +202,5 @@ ruler:
     kvstore:
       store: memberlist
 ```
+
+</details>
