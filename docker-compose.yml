@@ -9,7 +9,7 @@ services:
   minio:
     image: minio/minio
     entrypoint: [""]
-    command: ["sh", "-c", "mkdir -p /data/cortex-blocks && mkdir -p /data/cortex-rules && minio server /data --console-address=:9002"]
+    command: ["sh", "-c", "mkdir -p /data/cortex-blocks && mkdir -p /data/cortex-rules && mkdir -p /data/cortex-alertmanagers && minio server /data --console-address=:9002"]
     environment:
       - MINIO_ROOT_USER=cortex
       - MINIO_ROOT_PASSWORD=supersecret
@@ -108,6 +108,16 @@ services:
     volumes:
       - ./config/cortex:/cortex/config
       - data-cortex-3:/data
+  
+  cortex-gateway:
+    image: songjiayang/cortex-gateway:v0.2.0
+    command: 
+      - "-gateway.auth.jwt-secret=12345678"
+      - "-gateway.distributor.address=http://load-balancer"
+      - "-gateway.query-frontend.address=http://load-balancer"
+      - "-log.level=debug"
+    ports:
+      - 8081:80
 
 volumes:
   data-minio:

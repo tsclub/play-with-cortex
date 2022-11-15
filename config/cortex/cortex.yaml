@@ -1,4 +1,5 @@
-auth_enabled: true
+
+target: all,alertmanager
 
 limits:
   accept_ha_samples: true
@@ -13,30 +14,17 @@ distributor:
       store: consul
       consul:
         host: consul:8500
-      
-ingester_client:
-  grpc_client_config:
-    # Configure the client to allow messages up to 100MB.
-    max_recv_msg_size: 104857600
-    max_send_msg_size: 104857600
-    grpc_compression: gzip
 
 ingester:
   lifecycler:
-    # We want to start immediately.
-    join_after: 0
-    final_sleep: 0s
-    num_tokens: 512
     ring:
       kvstore:
         store: memberlist
-      replication_factor: 3
 
 memberlist:
   join_members: [cortex-1, cortex-2]
 
 querier:
-  query_ingesters_within: 3h
   at_modifier_enabled: true
 
 store_gateway:
@@ -50,9 +38,6 @@ blocks_storage:
   backend: s3
   tsdb:
     dir: /data/cortex-tsdb-ingester
-    ship_interval: 1m
-    block_ranges_period: [ 2h ]
-    retention_period: 3h
 
   bucket_store:
     sync_dir: /data/cortex-tsdb-querier
@@ -67,6 +52,9 @@ blocks_storage:
 storage:
   engine: blocks
 
+compactor:
+  data_dir: /data/cortex-compactor
+
 ruler:
   enable_api: true
   enable_sharding: true
@@ -74,11 +62,33 @@ ruler:
   ring:
     kvstore:
       store: memberlist
+  alertmanager_url: http://load-balancer
+  rule_path: /data/rules
 
 ruler_storage:
   backend: s3
   s3:
     bucket_name:       cortex-rules
+    endpoint:          minio:9000
+    access_key_id:     cortex
+    secret_access_key: supersecret
+    insecure: true
+
+alertmanager:
+  data_dir: /data/alertmanager
+  sharding_enabled: true
+  sharding_ring:
+    kvstore:
+      store: memberlist
+  enable_api: true
+  external_url: http://localhost:80/alertmanager
+  cluster:
+    peers: 'cortex-1,cortex-2'
+
+alertmanager_storage:
+  backend: s3
+  s3:
+    bucket_name:       cortex-alertmanagers
     endpoint:          minio:9000
     access_key_id:     cortex
     secret_access_key: supersecret

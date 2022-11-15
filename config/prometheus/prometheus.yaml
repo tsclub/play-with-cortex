@@ -11,7 +11,7 @@ scrape_configs:
       - targets: ['cortex-1','cortex-2','cortex-3']
 
 remote_write:
-  - url: http://load-balancer/api/v1/push
-    headers:
-      X-Scope-OrgID: demo
+  - url: http://cortex-gateway/api/v1/push
+    authorization:
+      credentials: eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRfaWQiOiJkZW1vIiwiYXVkIjoiZ3d0b29sLnRlbmFudC5hdWQiLCJ2ZXJzaW9uIjoxfQ.dBUZrpb8SV9hUMduP_G4JE-mfwv15p5Dmt0NMJUMvIUP4_FxoBy8_8sxZ09ObiJcCVq7Au35jUnua7tOTGvklQ
     send_exemplars: true
