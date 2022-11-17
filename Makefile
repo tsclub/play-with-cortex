@@ -1,6 +1,8 @@
-start:
-	sudo docker-compose up -d
+build-echo:
+	cd echo && go mod vendor && docker build -t echo:v0.1.0 .
+up:
+	docker-compose up -d
 stop:
-	sudo docker-compose stop
+	docker-compose stop
 down:
-	sudo docker-compose down
+	docker-compose down

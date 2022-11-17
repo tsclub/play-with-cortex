@@ -1,5 +1,0 @@
-name: cortex_exemplars_in
-rules:
-- expr: |
-    sum by (cluster, namespace, job) (rate(cortex_distributor_exemplars_in_total[5m]))
-  record: cluster_namespace_job:cortex_distributor_exemplars_in:rate5m

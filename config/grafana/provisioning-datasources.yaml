@@ -16,3 +16,16 @@ datasources:
     secureJsonData:
       httpHeaderValue1: 'demo'
     isDefault: true
+  - name: Cortex Alertmanager
+    uid: alertmanager
+    type: alertmanager
+    access: proxy
+    orgId: 1
+    url: http://load-balancer
+    version: 1
+    editable: true
+    jsonData:
+      httpHeaderName1: 'X-Scope-OrgID'
+      implementation: 'cortex'
+    secureJsonData:
+      httpHeaderValue1: 'demo'
