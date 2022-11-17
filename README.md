@@ -37,6 +37,11 @@ docker-compose down
 
 ### Lesson 1
 
+In this Lesson, you'll learn how to run Cortex cluster local with Docker Compose.
+
+<details>
+  <summary>Click me</summary>
+
 Start running your local setup with the following Docker command:
 
 ```
@@ -69,11 +74,15 @@ The following ports will be exposed on the host:
 - Cortex on [http://localhost:8001~8003](http://localhost:8001)
 - Minio on [http://localhost:9002](http://localhost:9002), super account is `cortex/supersecret`
 - Prometheus on [http://localhost:9090](http://localhost:9090)
+</details>
 
 ### Lesson 2
 
 In this Lesson, you'll learn how to use Cortex distributor's HATracker.
 
+<details>
+  <summary>Click me</summary>
+  
 You can run test with command:
 
 ```
@@ -87,7 +96,7 @@ When you visit [http://localhost:8001/distributor/ha_tracker](http://localhost:8
 
 If you stop `prometheus-2`, about 30s later it will auto change master to `prometheus-1`.
 
-#### Details about the change
+#### The changes
 
 Change `cortex.yaml` to enable HATracker
 
@@ -143,10 +152,15 @@ global:
 
 Note: `ha_cluster_label` default value is `cluster`, `ha_replica_label` is `__replica__`. you can configurate to another with `limits_config`.
 
+</details>
+
 ### Lesson 3
 
 In this Lesson, you'll learn how to enable record rules with cortex's ruler.
 
+<details>
+  <summary>Click me</summary>
+  
 You can run test with command:
 
 ```
@@ -154,32 +168,31 @@ git checkout lesson3
 docker-compose up -d
 ```
 
-After started, we use `curl` command to create some record rules
+After started, we use `cortex-tool` command to load rules and alertmanager configs.
 
-```
-$ curl -X POST -H 'X-Scope-OrgID: demo' -H 'content-type:application/yaml' --data-binary "@./config/cortex/rules/cortex_api_1.yaml"  http://localhost:8001/api/v1/rules/cortex
+```bash
+cortex-tool rules load config/rules/rules.yaml --address=http://localhost:8080 --id=demo
 
-
-{"status":"success","data":null,"errorType":"","error":""}
-```
-
-If you want to create all cortex related record rules, run `sh bin/rules.sh` please, after added you can check all of them with Cortex API
-
-```
-$ curl -H 'X-Scope-OrgID: demo' http://localhost:8001/api/v1/rules
+cd config/alertmanager && cortex-tool alertmanager load alertmanager.yaml default_templates --address=http://localhost:8080 --id=demo
 ```
 
-At last we can go to `Cortex/Ruler` Grafana dashboard to check ruler running status.
+After loaded, we can check the result:
 
-![ruler.png](./images/ruler.png)
+```bash
+cortex-tool rules list --address=http://localhost:8080 --id=demo
 
-#### Details about the change
+cortex-tool alertmanager get --address=http://localhost:8080 --id=demo
+```
+
+#### The changes
 
 We change Prometheus to Agent mode with `--enable-feature=agent` flag and remove the `rule_files` configuration from `prometheus.yaml` 
 
-Update `cortex.yaml` to enable ruler and enable sharding
+Update `cortex.yaml` to enable ruler and alertmanager with sharding
 
 ```
+target: all,alertmanager
+
 ruler:
   enable_api: true
   enable_sharding: true
@@ -187,4 +200,36 @@ ruler:
   ring:
     kvstore:
       store: memberlist
+  rule_path: /data/ruler
+  alertmanager_url: http://127.0.0.1/alertmanager
+
+ruler_storage:
+  backend: s3
+  s3:
+    bucket_name:       cortex
+    endpoint:          minio:9000
+    access_key_id:     cortex
+    secret_access_key: supersecret
+    insecure: true
+
+alertmanager:
+  data_dir: /data/alertmanager
+  fallback_config_file: /cortex/config/alertmanager-fallback-config.yaml
+  external_url: http://localhost:8080/alertmanager
+  sharding_enabled: true
+  sharding_ring:
+    kvstore:
+      store: memberlist
+  enable_api: true
+
+alertmanager_storage:
+  backend: s3
+  s3:
+    bucket_name:       cortex
+    endpoint:          minio:9000
+    access_key_id:     cortex
+    secret_access_key: supersecret
+    insecure: true
 ```
+
+</details>

@@ -1,3 +1,5 @@
+target: all,alertmanager
+
 auth_enabled: true
 
 limits:
@@ -33,7 +35,7 @@ ingester:
       replication_factor: 3
 
 memberlist:
-  join_members: [cortex-1, cortex-2]
+  join_members: [cortex-1, cortex-2, cortex-3]
 
 querier:
   query_ingesters_within: 3h
@@ -42,7 +44,7 @@ querier:
 store_gateway:
   sharding_enabled: true
   sharding_ring:
-    replication_factor: 1
+    replication_factor: 3
     kvstore:
       store: memberlist
 
@@ -59,13 +61,10 @@ blocks_storage:
 
   s3:
     endpoint:          minio:9000
-    bucket_name:       cortex-blocks
+    bucket_name:       cortex
     access_key_id:     cortex
     secret_access_key: supersecret
     insecure:          true
-
-storage:
-  engine: blocks
 
 ruler:
   enable_api: true
@@ -74,11 +73,32 @@ ruler:
   ring:
     kvstore:
       store: memberlist
+  rule_path: /data/ruler
+  alertmanager_url: http://127.0.0.1/alertmanager
 
 ruler_storage:
   backend: s3
   s3:
-    bucket_name:       cortex-rules
+    bucket_name:       cortex
+    endpoint:          minio:9000
+    access_key_id:     cortex
+    secret_access_key: supersecret
+    insecure: true
+
+alertmanager:
+  data_dir: /data/alertmanager
+  fallback_config_file: /cortex/config/alertmanager-fallback-config.yaml
+  external_url: http://localhost:8080/alertmanager
+  sharding_enabled: true
+  sharding_ring:
+    kvstore:
+      store: memberlist
+  enable_api: true
+
+alertmanager_storage:
+  backend: s3
+  s3:
+    bucket_name:       cortex
     endpoint:          minio:9000
     access_key_id:     cortex
     secret_access_key: supersecret

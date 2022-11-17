@@ -9,7 +9,7 @@ services:
   minio:
     image: minio/minio
     entrypoint: [""]
-    command: ["sh", "-c", "mkdir -p /data/cortex-blocks && mkdir -p /data/cortex-rules && minio server /data --console-address=:9002"]
+    command: ["sh", "-c", "mkdir -p /data/cortex && minio server /data --console-address=:9002"]
     environment:
       - MINIO_ROOT_USER=cortex
       - MINIO_ROOT_PASSWORD=supersecret
@@ -42,7 +42,7 @@ services:
       - 9091:9090
 
   grafana:
-    image: grafana/grafana:9.1.2
+    image: grafana/grafana:latest
     pull_policy: always
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
@@ -71,7 +71,7 @@ services:
       - 8080:80
 
   cortex-1:
-    image: cortexproject/cortex:v1.13.1
+    image: cortexproject/cortex:v1.14.0-rc.0
     hostname: cortex-1
     depends_on:
       - minio
@@ -84,7 +84,7 @@ services:
       - data-cortex-1:/data
 
   cortex-2:
-    image: cortexproject/cortex:v1.13.1
+    image: cortexproject/cortex:v1.14.0-rc.0
     hostname: cortex-2
     command: ["-config.file=/cortex/config/cortex.yaml", "-log.level=debug"]
     depends_on:
@@ -97,7 +97,7 @@ services:
       - data-cortex-2:/data
   
   cortex-3:
-    image: cortexproject/cortex:v1.13.1
+    image: cortexproject/cortex:v1.14.0-rc.0
     hostname: cortex-3
     command: ["-config.file=/cortex/config/cortex.yaml", "-log.level=debug"]
     depends_on:
@@ -108,6 +108,11 @@ services:
     volumes:
       - ./config/cortex:/cortex/config
       - data-cortex-3:/data
+      
+  echo:
+    image: echo:v0.1.0
+    ports:
+      - 9094:9094
 
 volumes:
   data-minio:
